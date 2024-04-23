@@ -1,13 +1,83 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* overflow: hidden; */
+  background: transparent;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.upload-image-container {
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+}
+
+.ad-photo-container {
+  border: 4px dashed #E9E9E9;
+  border-spacing: 12px;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  padding: 40px 250px;
+  border-radius: 30px;
+}
+
+.new-line {
+  display: block;
+  color: white;
+}
+
+.ad-selected-img {
+  max-width: 100px;
+  max-height: 100px;
+  overflow: hidden;
+  margin-top: 10px;
+  border-radius: 20px;
+  border: 2px solid white;
+}
+
+.ad-img-cross-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-upload-div {
+  /* margin-top: 25%; */
+  width: 100%;
+  background-color: #4B5320;
+  border-radius: 20px;
+  padding: 30px;
+  /* height: 100vh; */
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; */
+}
+
+.remove-file {
+  margin-left: 20px;
+  color: white;
+}
+
+@media (max-width: 767px) {
+  .image-upload-div {
+    margin-top: 60%;
+  }
+
+  .ad-photo-container {
+    padding: 20px 150px;
+  }
 }
