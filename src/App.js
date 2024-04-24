@@ -10,8 +10,8 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route exact path="/" element={<Login />} />
-          <Route exact path="/home" element={<Main />} />
+          {/* <Route exact path="/" element={<Login />} /> */}
+          <Route exact path="/" element={<Main />} />
           <Route exact path="/upload_images" element={<UploadImages />} />
         </Routes>
       </Router>

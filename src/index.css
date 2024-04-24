@@ -28,6 +28,7 @@ body {
 .new-line {
   display: block;
   color: white;
+  font-size: 22px !important;
 }
 
 .ad-selected-img {

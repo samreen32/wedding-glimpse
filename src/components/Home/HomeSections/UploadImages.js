@@ -104,7 +104,7 @@ function UploadImages() {
                 <img src={adPhoto} alt='' style={{ width: "90px" }} />
                 <div className='mt-3' onClick={handleBrowseClick}
                   style={{ cursor: 'pointer' }}>
-                  <p style={{ fontWeight: "600", color: "white" }}>
+                  <p style={{ fontWeight: "600", color: "white", fontSize: "22px" }}>
                     Drag and Drop
                     <span className="new-line">
                       or
@@ -148,7 +148,7 @@ function UploadImages() {
                     <button
                       onClick={() => handleRemoveFile(file.name)}
                       className='ad-img-cross-icon ml-3 mt-1'>
-                      <span style={{ fontSize: '20px', color: "white" }}>×</span>
+                      <span style={{ fontSize: '24px', color: "black", fontWeight: "800" }}>×</span>
                     </button>
                   </div>
                 )}
@@ -161,7 +161,7 @@ function UploadImages() {
       <br />
       <br />
       <br />
-      <MenuBar />
+      {/* <MenuBar /> */}
     </div>
   )
 }
