@@ -39,7 +39,7 @@ function Main() {
             </> */}
             <div className='main-section'>
                 <div className="header">
-                    <h1 className='mt-3'>Welcome to Wedding</h1>
+                    <h1 className='mt-3'>THE WEDDING OF HARV AND MICHELLE</h1>
                     <p className='mt-3'>
                         We’re so honoured that you’re here to celebrate with us.<br />
                         If you choose to take any pictures or videos, <br />
@@ -54,7 +54,7 @@ function Main() {
                         <div class="button__drow1"></div>
                         <div class="button__drow2"></div>
                     </Link>
-                    <Link to="/" class="button type--B">
+                    <Link to="/upload_videos" class="button type--B">
                         <div class="button__line"></div>
                         <div class="button__line"></div>
                         <span class="button__text">Upload Videos</span>
@@ -69,7 +69,7 @@ function Main() {
                         <div class="button__drow2"></div>
                     </Link>
                 </div>
-                <div className="inner mt-5">
+                {/* <div className="inner mt-5">
                     <div className="app-loader-animation">
                         <Lottie
                             animationData={require("../../assets/animation/Animation - 1713971808298.json")}
@@ -79,7 +79,7 @@ function Main() {
                             style={{ width: "100%", left: "300px", }}
                         />
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     )

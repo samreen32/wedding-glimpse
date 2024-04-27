@@ -15,7 +15,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('../../assets/img/login-back2.webp');
+    background-image: url('../../assets/img/home3.webp');
     background-size: cover;
     /* opacity: 0.6; */
     z-index: -1;
@@ -989,4 +989,14 @@ a {
     100% {
         width: 124px;
     }
+}
+
+.title-upload {
+    color: black;
+    font-weight: 700;
+    font-size: 32px;
+}
+
+.file-item {
+    color: white;
 }
