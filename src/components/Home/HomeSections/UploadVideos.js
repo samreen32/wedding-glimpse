@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react';
-import img2 from "../../../assets/img/login-back1.webp";
+import img2 from "../../../assets/img/home3.webp";
 import { IoIosArrowBack } from 'react-icons/io';
-import { useNavigate } from 'react-router';
 import { FaPhotoVideo } from "react-icons/fa";
+import { useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
-
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 function UploadVideos() {
     let navigate = useNavigate();
@@ -55,61 +55,47 @@ function UploadVideos() {
         }
     };
 
-    const uploadVideo = async (videoFile) => {
-        const formData = new FormData();
-        formData.append('file', videoFile);
-        formData.append('upload_preset', 'tvfer9dl');
-
+    const uploadVideoToFirebase = async (videoFile) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, `videos/${videoFile.name}`);
         try {
-            const response = await fetch(`https://api.cloudinary.com/v1_1/drgrcajhq/video/upload`, {
-                method: 'POST',
-                body: formData
+            const snapshot = await uploadBytes(storageRef, videoFile);
+            const downloadUrl = await getDownloadURL(snapshot.ref);
+            console.log('Firebase Upload successful:', downloadUrl);
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your video has been uploaded successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK'
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Upload successful:', data);
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Your video has been uploaded successfully!',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-            } else {
-                const errorData = await response.json();
-                console.error('Upload failed:', errorData);
-                Swal.fire({
-                    title: 'Oops!',
-                    text: 'Failed to uplaod. Try again!',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                  });
-            }
         } catch (error) {
-            console.error('Error uploading video:', error);
-            alert('Error during video upload.');
+            console.error('Firebase Upload failed:', error);
+            Swal.fire({
+                title: 'Oops!',
+                text: 'Failed to upload. Try again!',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
     };
 
     const handleUploadClick = () => {
         selectedFiles.forEach(videoFile => {
-            uploadVideo(videoFile);
+            uploadVideoToFirebase(videoFile);
         });
     };
 
-
     return (
-
         <div className='upload-image-container'
             style={{ backgroundImage: `url(${img2})`, backgroundSize: 'cover' }}
         >
             <div className='h-100 py-5 pb-5'>
                 <div className="d-flex align-items-center mb-3" style={{ justifyContent: "flex-start" }}>
-                    <IoIosArrowBack style={{ cursor: 'pointer', marginRight: 'auto' }} size={50}
-                        onClick={() => navigate("/")} />
-                    <h1 className="title-upload"
-                        style={{ margin: '0px 40% 0px 0px', textAlign: "center" }}
-                    >
+                    <h1 className="title-upload" style={{
+                        margin: 'auto', textAlign: "center", justifyContent: "center",
+                        display: "flex"
+                    }}>
+                        <IoIosArrowBack style={{ cursor: 'pointer', marginRight: 'auto' }} size={50} onClick={() => navigate("/")} />
                         Upload Videos
                     </h1>
                 </div>
@@ -130,8 +116,7 @@ function UploadVideos() {
                                         or
                                         <span style={{ color: "white", cursor: "pointer", fontWeight: "600" }} className='mx-1'>
                                             Drop more Files
-                                        </span><br />
-                                        <br />
+                                        </span><br /><br />
                                         <button
                                             style={{
                                                 background: "#9ACD32",
@@ -141,7 +126,7 @@ function UploadVideos() {
                                                 padding: "16px"
                                             }}
                                             onClick={handleUploadClick}
-                                            className='mx-1'>
+                                            className='mx-1 mt-5'>
                                             Upload Video
                                         </button>
                                     </span>
@@ -149,7 +134,6 @@ function UploadVideos() {
                             ) : (
                                 <>
                                     <FaPhotoVideo alt='' size={50} color='white' />
-                                    {/* <img src={adPhoto} alt='' style={{ width: "90px" }} /> */}
                                     <div className='mt-3' onClick={handleBrowseClick} style={{ cursor: 'pointer' }}>
                                         <p style={{ fontWeight: "600", color: "white", fontSize: "22px" }}>
                                             Drag and Drop

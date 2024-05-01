@@ -1,16 +1,16 @@
 import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
+import Swal from 'sweetalert2';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import img2 from "../../../assets/img/home2.webp";
 import adPhoto from "../../../assets/img/cloud.png";
 import { IoIosArrowBack } from 'react-icons/io';
-import { useNavigate } from 'react-router';
-import Swal from 'sweetalert2';
 
 function UploadImages() {
   let navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [dragOver, setDragOver] = useState(false);
-  const cloudName = "drgrcajhq";
 
   const handleBrowseClick = () => {
     fileInputRef.current.click();
@@ -44,44 +44,33 @@ function UploadImages() {
     setSelectedFiles(prevFiles => prevFiles.filter(file => file.name !== fileName));
   };
 
-  const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'tvfer9dl');
-
+  const uploadImageToFirebase = async (file) => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `images/${file.name}`);
     try {
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: 'POST',
-        body: formData
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+      console.log('Firebase Upload successful:', downloadUrl);
+      Swal.fire({
+        title: 'Success!',
+        text: 'Your image has been uploaded successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK'
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Upload successful:', data);
-        Swal.fire({
-          title: 'Success!',
-          text: 'Your image has been uploaded successfully!',
-          icon: 'success',
-          confirmButtonText: 'OK'
-        });
-      } else {
-        const errorData = await response.json();
-        console.error('Upload failed:', errorData);
-        Swal.fire({
-          title: 'Oops!',
-          text: 'Failed to uplaod. Try again!',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
     } catch (error) {
-      console.error('Error uploading file: ', error);
+      console.error('Firebase Upload failed:', error);
+      Swal.fire({
+        title: 'Oops!',
+        text: 'Failed to upload. Try again!',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
   const handleUploadClick = () => {
     selectedFiles.forEach(file => {
-      uploadImage(file);
+      uploadImageToFirebase(file);
     });
   };
 
@@ -90,19 +79,16 @@ function UploadImages() {
     setSelectedFiles(prevFiles => [...prevFiles, ...files]);
   };
 
-
   return (
-    <div
-      className='upload-image-container'
-      style={{ backgroundImage: `url(${img2})`, backgroundSize: 'cover', }}
-    >
+    <div className='upload-image-container' style={{ backgroundImage: `url(${img2})`, backgroundSize: 'cover' }}>
       <div className='h-100 py-5 pb-5'>
         <div className="d-flex align-items-center mb-3" style={{ justifyContent: "flex-start" }}>
-          <IoIosArrowBack style={{ cursor: 'pointer', marginRight: 'auto' }} size={50}
-            onClick={() => navigate("/")} />
-          <h1 className="title-upload"
-            style={{ margin: '0px 40% 0px 0px', textAlign: "center" }}
-          >
+
+          <h1 className="title-upload" style={{
+            margin: 'auto', textAlign: "center", justifyContent: "center",
+            display: "flex"
+          }}>
+            <IoIosArrowBack style={{ cursor: 'pointer', marginRight: 'auto' }} size={50} onClick={() => navigate("/")} />
             Upload Images
           </h1>
         </div>
@@ -115,6 +101,7 @@ function UploadImages() {
             onDrop={handleDrop}
           >
             <div className='col-md-12 ad-photo-container'>
+
               {selectedFiles?.length > 0 ? (
                 <>
                   <div className='mt-3'
@@ -142,44 +129,33 @@ function UploadImages() {
                       }}
                       className='mx-1'>
                       Drop more Files
-                    </span><br /><br />
-                    <button
-                      style={{
-                        background: "#9ACD32",
-                        color: "white",
-                        cursor: "pointer",
-                        fontWeight: "600",
-                        padding: "16px"
-                      }}
-                      onClick={handleUploadClick}
-                      className='mx-1'>
-                      Upload Image
-                    </button>
+                    </span>
                   </span>
+                  <button style={{ background: "#9ACD32", color: "white", cursor: "pointer", fontWeight: "600", padding: "16px" }}
+                    onClick={handleUploadClick}>Upload Image</button>
+
                 </>
               ) : (
-                <>
-                  <img src={adPhoto} alt='' style={{ width: "90px" }} />
-                  <div className='mt-3' onClick={handleBrowseClick}
-                    style={{ cursor: 'pointer' }}>
-                    <p style={{ fontWeight: "600", color: "white", fontSize: "22px" }}>
-                      Drag and Drop
-                      <span className="new-line">
-                        or
-                        <span style={{ color: "#66b855" }} className='mx-1'>
-                          Browse
-                        </span>
+                <div className='mt-3' onClick={handleBrowseClick}
+                  style={{ cursor: 'pointer' }}>
+                  <img src={adPhoto} alt='' />
+                  <p style={{ fontWeight: "600" }}>
+                    Drag and Drop
+                    <span className="new-line">
+                      or
+                      <span style={{ color: "#fff" }} className='mx-1'>
+                        Browse
                       </span>
-                    </p>
-                    <span className="new-line pb-4"
-                      style={{
-                        color: "white", fontSize: "14px"
-                      }}
-                    >
-                      png, jpg, jpeg
                     </span>
-                  </div>
-                </>
+                  </p>
+                  <span className="new-line pb-4 mt-2"
+                    style={{
+                      color: "#fff", fontSize: "14px",
+                      marginTop: "-20px"
+                    }}>
+                    .jpg, .png, .jpeg
+                  </span>
+                </div>
               )}
               <input
                 type="file"
@@ -193,21 +169,40 @@ function UploadImages() {
             </div>
           </div>
 
-          <div className='row mt-3'
-            style={{ cursor: 'pointer', maxHeight: '250px', overflowY: 'auto' }}>
+
+          <div className='row mt-3' style={{
+            cursor: 'pointer',
+            maxHeight: '150px',
+
+            overflowY: 'auto'
+          }}>
             <div style={{ display: "flex" }}>
               {selectedFiles.map((file, index) => (
                 <div key={index} className="position-relative mb-2">
-                  {file.type.startsWith('image/') && (
+                  {file.url ? (
                     <div className='ad-selected-img mx-2'>
                       <img
-                        src={URL.createObjectURL(file)} alt={file.name}
+                        src={file.url}
+                        alt={file.name}
                         style={{ width: '200px', height: "200px", objectFit: "cover" }}
                       />
                       <button
                         onClick={() => handleRemoveFile(file.name)}
-                        className='ad-img-cross-icon ml-3 mt-1'>
-                        <span style={{ fontSize: '24px', color: "black", fontWeight: "800" }}>×</span>
+                        className='ad-img-cross-icon' >
+                        <span style={{ fontSize: '23px' }}>×</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className='ad-selected-img mx-2'>
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={file.name}
+                        style={{ width: '200px', height: "200px", objectFit: "cover" }}
+                      />
+                      <button
+                        onClick={() => handleRemoveFile(file.name)}
+                        className='ad-img-cross-icon' >
+                        <span style={{ fontSize: '23px' }}>×</span>
                       </button>
                     </div>
                   )}
@@ -218,7 +213,7 @@ function UploadImages() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default UploadImages
+export default UploadImages;

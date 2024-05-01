@@ -8,6 +8,14 @@
     color: white;
 }
 
+.top-right {
+    display: flex;
+    justify-content: flex-end; /* Pushes the button to the right */
+    width: 100%;
+    padding: 20px; /* Adds some padding around the button */
+    padding-right: 30%; /* Increase right padding to move the button slightly to the left */
+}
+
 .main-container::before {
     content: '';
     position: absolute;
@@ -695,7 +703,7 @@ a {
 
 .button-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .button-container button {
