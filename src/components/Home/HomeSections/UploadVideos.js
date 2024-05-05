@@ -135,7 +135,7 @@ function UploadVideos() {
                                 <>
                                     <FaPhotoVideo alt='' size={50} color='white' />
                                     <div className='mt-3' onClick={handleBrowseClick} style={{ cursor: 'pointer' }}>
-                                        <p style={{ fontWeight: "600", color: "white", fontSize: "22px" }}>
+                                        <p className='new-line'>
                                             Drag and Drop
                                             <span className="new-line">
                                                 or

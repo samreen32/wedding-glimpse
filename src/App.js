@@ -5,7 +5,6 @@ import Main from "./components/Home/Main";
 import UploadImages from "./components/Home/HomeSections/UploadImages";
 import UploadVideos from "./components/Home/HomeSections/UploadVideos";
 import Login from "./components/AuthScreens/Login"
-import ViewMedia from "./components/Home/HomeSections/ViewImages";
 import ViewImages from "./components/Home/HomeSections/ViewImages";
 import ViewVideos from "./components/Home/HomeSections/ViewVideos";
 import OptionMedia from "./components/Home/HomeSections/OptionMedia";

@@ -37,6 +37,7 @@ body {
   display: block;
   color: white;
   font-size: 22px !important;
+  font-weight: 600 !important;
 }
 
 .ad-selected-img {
@@ -70,21 +71,32 @@ body {
   padding: 30px;
 }
 
+@media (max-width: 576px) {
+  .image-upload-div {
+    width: 500px !important;
+  }
+
+  .new-line{
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 490px) {
+  .image-upload-div {
+    width: 450px !important;
+  }
+}
+
 .remove-file {
   margin-left: 20px;
   color: black;
 }
 
 @media (max-width: 767px) {
-  .image-upload-div {
-    margin-top: 60%;
-  }
-
   .ad-photo-container {
     padding: 20px 150px;
   }
 }
-
 
 .media-img {
   width: 450px;

@@ -4,29 +4,35 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { IoIosArrowBack } from 'react-icons/io';
 import { getStorage, ref, listAll, getDownloadURL, deleteObject } from 'firebase/storage';
+import Checkbox from '@mui/material/Checkbox';
+import { saveAs } from 'file-saver';
+import axios from 'axios';
+
+const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
 function ViewImages() {
   let navigate = useNavigate();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
+  const [atLeastOneSelected, setAtLeastOneSelected] = useState(false);
 
+  // Fetch images from firebase
   useEffect(() => {
     const fetchImages = async () => {
       const storage = getStorage();
       const listRef = ref(storage, 'images/');
-
       setLoading(true);
-
       try {
         const res = await listAll(listRef);
         const imageUrls = await Promise.all(res.items.map((itemRef) => {
           return getDownloadURL(itemRef).then(url => ({
             url,
-            ref: itemRef  // Store the reference for deletion and download
+            ref: itemRef
           }));
         }));
 
-        setImages(imageUrls);
+        setImages(imageUrls.map(image => ({ ...image, selected: false })));
       } catch (error) {
         console.error("Failed to retrieve images:", error);
       } finally {
@@ -37,6 +43,7 @@ function ViewImages() {
     fetchImages();
   }, []);
 
+  // Delete images using firebase
   const handleDeleteImage = async (imageRef) => {
     try {
       await deleteObject(imageRef);
@@ -52,41 +59,121 @@ function ViewImages() {
     }
   };
 
-  const handleDownloadImage = async (url, name) => {
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    const updatedImages = images.map(image => ({ ...image, selected: !selectAll }));
+    setImages(updatedImages);
+    setAtLeastOneSelected(!selectAll);
+  };
+
+  const handleImageSelect = (index) => {
+    const updatedImages = [...images];
+    updatedImages[index].selected = !updatedImages[index].selected;
+    setImages(updatedImages);
+    setAtLeastOneSelected(updatedImages.some(image => image.selected));
+  };
+
+  const handleDeleteSelectedImages = () => {
+    const selectedImageRefs = images.filter(image => image.selected).map(image => image.ref);
+    if (selectedImageRefs.length === 0) {
+      Swal.fire('No images selected!', 'Please select at least one image to delete.', 'warning');
+      return;
+    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover the image!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete them!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await Promise.all(selectedImageRefs.map(imageRef => deleteObject(imageRef)));
+          setImages(prevImages => prevImages.filter(image => !selectedImageRefs.includes(image.ref)));
+          Swal.fire(
+            'Deleted!',
+            'Selected images have been deleted.',
+            'success'
+          );
+        } catch (error) {
+          console.error('Error removing images:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Failed to delete the images!'
+          });
+        }
+      }
+    });
+  };
+
+  const handleDownloadSelectedImages = async () => {
+    const selectedImages = images.filter(image => image.selected);
+
+    if (selectedImages.length === 0) {
+      Swal.fire('No images selected!', 'Please select at least one image to download.', 'warning');
+      return;
+    }
+
+    Swal.fire({
+      title: 'Processing...',
+      text: 'Uploading and downloading images, please wait.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Network response was not ok. Status: ${response.status}`);
+      const cloudinaryUrls = await Promise.all(selectedImages.map(async image => {
+        const formData = new FormData();
+        formData.append('file', image.url);
+        formData.append('upload_preset', 'tvfer9dl');
 
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
+        const response = await axios.post('https://api.cloudinary.com/v1_1/drgrcajhq/image/upload', formData);
+        return response.data.secure_url;
+      }));
 
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = name;
-      document.body.appendChild(link);
-      link.click();
+      cloudinaryUrls.forEach(url => saveAs(url, url.split('/').pop()));
 
-      // Clean up
-      window.URL.revokeObjectURL(downloadUrl);
-      document.body.removeChild(link);
+      Swal.fire(
+        'Download Complete!',
+        'Selected images have been downloaded.',
+        'success'
+      );
     } catch (error) {
-      console.error('Error downloading image:', error);
+      console.error('Failed to upload or download the images:', error);
       Swal.fire({
         icon: 'error',
-        title: 'Download failed',
-        text: `Could not download the image, please try again. Error: ${error.message}`
+        title: 'Oops...',
+        text: 'Failed to upload or download the images!'
       });
     }
   };
 
-  // const handleDownloadImage = (url, name) => {
-  //   Swal.fire({
-  //     icon: 'info',
-  //     title: 'Click to Download',
-  //     html: `<a href="${url}" target="_blank" download="${name}">Click here to download the image</a>`
-  //   });
-  // };
 
+
+  const handleDownload = async (image, e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('file', image);
+    formData.append('upload_preset', 'tvfer9dl');
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/drgrcajhq/image/upload', formData);
+      saveAs(response.data.secure_url, 'downloaded-image.jpg');
+    } catch (error) {
+      console.error('Failed to upload or download the image:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Failed to upload or download the image!'
+      });
+    }
+  };
 
   return (
     <>
@@ -101,24 +188,55 @@ function ViewImages() {
               Images
             </h1>
           </div>
+          <div className='px-3'
+            style={{ display: "flex", justifyContent: "space-between", textAlign: "center" }}>
+            <div className='mx-3' style={{ color: "white" }}>
+              <Checkbox
+                {...label}
+                checked={selectAll}
+                onChange={handleSelectAll}
+              />
+              <span style={{ fontSize: "18px" }}>Select All</span>
+            </div>
+            <div>
+              <button className="btn btn-danger mt-2" onClick={handleDeleteSelectedImages} disabled={!atLeastOneSelected}>
+                Delete Images
+              </button>
+              <button
+                className="btn btn-warning mt-2 mx-2"
+                style={{ background: "#4B5320", color: "white", border: "none" }}
+                onClick={handleDownloadSelectedImages} disabled={!atLeastOneSelected}
+              >
+                Download Images
+              </button>
+            </div>
+          </div>
           <div className='row mt-3'>
             {loading ? <p>Loading images...</p> : (
               images.map((image, index) => (
                 <div className="col-md-3 col-sm-12" key={index}>
-                  <div className="container" >
+                  <div className="container" style={{ position: 'relative' }}>
+                    <Checkbox
+                      {...label}
+                      checked={image.selected}
+                      onChange={() => handleImageSelect(index)}
+                      style={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
+                    />
                     <img className="media-img"
                       src={image.url} alt={`Uploaded ${index}`}
-                      style={{ width: "100%" }}
+                      style={{ width: "100%", cursor: 'pointer' }}
                     />
                     <div className="button-group">
                       <button className="btn btn-danger mt-2"
                         onClick={() => handleDeleteImage(image.ref)}>
                         Delete Image
                       </button>
-                      {/* <button className="btn btn-secondary mt-2 mx-1"
-                        onClick={() => handleDownloadImage(image.url, `Image_${index}.jpg`)}>
+                      <button className="btn btn-secondary mt-2 mx-2"
+                        onClick={(e) =>
+                          handleDownload(image.url, e)}
+                      >
                         Download Image
-                      </button> */}
+                      </button>
                     </div>
                   </div>
                 </div>
