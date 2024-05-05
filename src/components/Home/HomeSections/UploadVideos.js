@@ -5,10 +5,12 @@ import { FaPhotoVideo } from "react-icons/fa";
 import { useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Lottie from 'lottie-react';
 
 function UploadVideos() {
     let navigate = useNavigate();
     const fileInputRef = useRef(null);
+    const [uploading, setUploading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [dragOver, setDragOver] = useState(false);
 
@@ -58,6 +60,7 @@ function UploadVideos() {
     const uploadVideoToFirebase = async (videoFile) => {
         const storage = getStorage();
         const storageRef = ref(storage, `videos/${videoFile.name}`);
+        setUploading(true); // Start uploading
         try {
             const snapshot = await uploadBytes(storageRef, videoFile);
             const downloadUrl = await getDownloadURL(snapshot.ref);
@@ -76,14 +79,19 @@ function UploadVideos() {
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
+        } finally {
+            setUploading(false);
         }
     };
 
-    const handleUploadClick = () => {
+
+    const handleUploadClick = (event) => {
+        event.stopPropagation();
         selectedFiles.forEach(videoFile => {
             uploadVideoToFirebase(videoFile);
         });
     };
+
 
     return (
         <div className='upload-image-container'
@@ -95,7 +103,8 @@ function UploadVideos() {
                         margin: 'auto', textAlign: "center", justifyContent: "center",
                         display: "flex"
                     }}>
-                        <IoIosArrowBack style={{ cursor: 'pointer', marginRight: 'auto' }} size={50} onClick={() => navigate("/")} />
+                        <IoIosArrowBack style={{ cursor: 'pointer', marginRight: 'auto' }}
+                            size={50} onClick={() => navigate("/")} />
                         Upload Videos
                     </h1>
                 </div>
@@ -114,19 +123,26 @@ function UploadVideos() {
                                     </div>
                                     <span className="new-line pb-3 mt-3" onClick={handleBrowseClick}>
                                         or
-                                        <span style={{ color: "white", cursor: "pointer", fontWeight: "600" }} className='mx-1'>
+                                        <span
+                                            style={{ color: "white", cursor: "pointer", fontWeight: "600" }}
+                                            className='mx-1'
+                                        >
                                             Drop more Files
-                                        </span><br /><br />
+                                        </span>
+                                        <br />
                                         <button
                                             style={{
-                                                background: "#9ACD32",
-                                                color: "white",
+                                                background: "white",
+                                                color: "black",
                                                 cursor: "pointer",
                                                 fontWeight: "600",
-                                                padding: "16px"
+                                                padding: "12px 20px",
+                                                borderRadius: "30px"
                                             }}
                                             onClick={handleUploadClick}
-                                            className='mx-1 mt-5'>
+                                            disabled={uploading}
+                                            className='mx-1 mt-5'
+                                        >
                                             Upload Video
                                         </button>
                                     </span>
@@ -144,12 +160,25 @@ function UploadVideos() {
                                                 </span>
                                             </span>
                                         </p>
-                                        <span className="new-line pb-4" style={{ color: "white", fontSize: "14px" }}>mp4, avi, mov</span>
+                                        <span
+                                            className="new-line pb-4"
+                                            style={{ color: "white", fontSize: "14px" }}
+                                        >
+                                            mp4, avi, mov
+                                        </span>
                                     </div>
                                 </>
                             )}
-                            <input type="file" ref={fileInputRef} accept="video/mp4, video/x-m4v, video/*" multiple style={{ display: 'none' }} onChange={handleFilesChange} />
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                accept="video/mp4, video/x-m4v, video/*"
+                                multiple
+                                style={{ display: 'none' }}
+                                onChange={handleFilesChange}
+                            />
                         </div>
+
                     </div>
                     <div className='row mt-3'
                         style={{ cursor: 'pointer', maxHeight: '250px', overflowY: 'auto' }}
@@ -169,8 +198,20 @@ function UploadVideos() {
                         ))}
                     </div>
                 </div>
+                {uploading && (
+                    <div className="cv-progress-animation">
+                        <Lottie
+                            animationData={require("../../../assets/animation/progress.json")}
+                            loop
+                            autoplay
+                            className="cv-progress"
+                        />
+                    </div>
+                )}
             </div>
             <br />
+
+
         </div>
     );
 }

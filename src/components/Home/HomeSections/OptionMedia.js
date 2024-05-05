@@ -10,7 +10,7 @@ function OptionMedia() {
         <>
             {/* <div className='main-section'> */}
             <div className='upload-image-container' style={{ backgroundImage: `url(${img2})`, backgroundSize: 'cover' }}>
-                <div className='h-100 py-5 pb-5 px-5 container'>
+                <div className='h-100 container choose-media-top'>
                     <div className="d-flex align-items-center mb-3 mt-5" style={{ justifyContent: "flex-start" }}>
                         <IoIosArrowBack
                             style={{ cursor: 'pointer', marginRight: 'auto' }}
@@ -37,7 +37,7 @@ function OptionMedia() {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-sm-6">
+                        <div className="col-sm-6 mb-3 mb-sm-0">
                             <div className="card" style={{
                                 background: "#4B5320", color: "white",
                                 height: "100%"

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function Main() {
     return (
         <div className='main-container'>
-            <div className="top-right">
+            <div className="top-right" style={{ marginRight: "20px" }}>
                 <Link to="/login" className="button type--C">
                     <div className="button__line"></div>
                     <div className="button__line"></div>

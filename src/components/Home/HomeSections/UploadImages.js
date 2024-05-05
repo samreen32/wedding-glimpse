@@ -5,10 +5,12 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import img2 from "../../../assets/img/home2.webp";
 import adPhoto from "../../../assets/img/cloud.png";
 import { IoIosArrowBack } from 'react-icons/io';
+import Lottie from 'lottie-react';
 
 function UploadImages() {
   let navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [dragOver, setDragOver] = useState(false);
 
@@ -47,6 +49,7 @@ function UploadImages() {
   const uploadImageToFirebase = async (file) => {
     const storage = getStorage();
     const storageRef = ref(storage, `images/${file.name}`);
+    setUploading(true);
     try {
       const snapshot = await uploadBytes(storageRef, file);
       const downloadUrl = await getDownloadURL(snapshot.ref);
@@ -65,6 +68,8 @@ function UploadImages() {
         icon: 'error',
         confirmButtonText: 'OK'
       });
+    } finally {
+      setUploading(false); // End uploading
     }
   };
 
@@ -101,7 +106,6 @@ function UploadImages() {
             onDrop={handleDrop}
           >
             <div className='col-md-12 ad-photo-container'>
-
               {selectedFiles?.length > 0 ? (
                 <>
                   <div className='mt-3'
@@ -131,14 +135,24 @@ function UploadImages() {
                       Drop more Files
                     </span>
                   </span>
-                  <button style={{ background: "#9ACD32", color: "white", cursor: "pointer", fontWeight: "600", padding: "16px" }}
-                    onClick={handleUploadClick}>Upload Image</button>
-
+                  <button style={{
+                    background: "white",
+                    color: "black",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    padding: "12px 20px",
+                    borderRadius: "30px"
+                  }}
+                    onClick={handleUploadClick}
+                    disabled={uploading}
+                  >
+                    Upload Image
+                  </button>
                 </>
               ) : (
                 <div className='mt-3' onClick={handleBrowseClick}
                   style={{ cursor: 'pointer' }}>
-                  <img src={adPhoto} alt='' />
+                  <img src={adPhoto} alt='' className='cloud-img' />
                   <p style={{ fontWeight: "600" }}>
                     Drag and Drop
                     <span className="new-line">
@@ -165,10 +179,8 @@ function UploadImages() {
                 style={{ display: 'none' }}
                 onChange={handleFilesChange}
               />
-
             </div>
           </div>
-
 
           <div className='row mt-3' style={{
             cursor: 'pointer',
@@ -211,6 +223,16 @@ function UploadImages() {
             </div>
           </div>
         </div>
+        {uploading && (
+          <div className="cv-progress-animation">
+            <Lottie
+              animationData={require("../../../assets/animation/progress.json")}
+              loop
+              autoplay
+              className="cv-progress"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -153,8 +153,6 @@ function ViewImages() {
     }
   };
 
-
-
   const handleDownload = async (image, e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -164,7 +162,7 @@ function ViewImages() {
     try {
       const response = await axios.post(
         'https://api.cloudinary.com/v1_1/drgrcajhq/image/upload', formData);
-      saveAs(response.data.secure_url, 'downloaded-image.jpg');
+      saveAs(response.data.secure_url, 'weeding-image.jpg');
     } catch (error) {
       console.error('Failed to upload or download the image:', error);
       Swal.fire({
@@ -185,36 +183,35 @@ function ViewImages() {
               display: "flex"
             }}>
               <IoIosArrowBack style={{ cursor: 'pointer', marginRight: 'auto' }} size={50} onClick={() => navigate("/view_media")} />
-              Images
+              Wedding Images
             </h1>
           </div>
-          <div className='px-3'
-            style={{ display: "flex", justifyContent: "space-between", textAlign: "center" }}>
-            <div className='mx-3' style={{ color: "white" }}>
+          <div className='control-bar'>
+            <div className='control-group'>
               <Checkbox
-                {...label}
                 checked={selectAll}
                 onChange={handleSelectAll}
               />
-              <span style={{ fontSize: "18px" }}>Select All</span>
+              <span className='select-all-text'>Select All</span>
             </div>
-            <div>
-              <button className="btn btn-danger mt-2" onClick={handleDeleteSelectedImages} disabled={!atLeastOneSelected}>
+            <div className='control-group'>
+              <button className="btn btn-danger" onClick={handleDeleteSelectedImages} disabled={!atLeastOneSelected}>
                 Delete Images
               </button>
               <button
-                className="btn btn-warning mt-2 mx-2"
-                style={{ background: "#4B5320", color: "white", border: "none" }}
+                className="btn btn-warning"
+                style={{ background: "#4B5320", color: "white" }}
                 onClick={handleDownloadSelectedImages} disabled={!atLeastOneSelected}
               >
                 Download Images
               </button>
             </div>
           </div>
-          <div className='row mt-3'>
+
+          <div className='mt-3 view-images-row'>
             {loading ? <p>Loading images...</p> : (
               images.map((image, index) => (
-                <div className="col-md-3 col-sm-12" key={index}>
+                <div className="" key={index}>
                   <div className="container" style={{ position: 'relative' }}>
                     <Checkbox
                       {...label}
@@ -229,13 +226,13 @@ function ViewImages() {
                     <div className="button-group">
                       <button className="btn btn-danger mt-2"
                         onClick={() => handleDeleteImage(image.ref)}>
-                        Delete Image
+                        Delete
                       </button>
                       <button className="btn btn-secondary mt-2 mx-2"
                         onClick={(e) =>
                           handleDownload(image.url, e)}
                       >
-                        Download Image
+                        Download
                       </button>
                     </div>
                   </div>

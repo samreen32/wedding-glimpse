@@ -1,19 +1,19 @@
 .main-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    color: white;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "top"
+        "section";
+    gap: 20px;
+    padding: 20px;
+    overflow: auto;
+    /* height: 100vh; */
 }
 
 .top-right {
+    grid-area: top;
     display: flex;
-    justify-content: flex-end; /* Pushes the button to the right */
-    width: 100%;
-    padding: 20px; /* Adds some padding around the button */
-    padding-right: 30%; /* Increase right padding to move the button slightly to the left */
+    justify-content: flex-end;
 }
 
 .main-container::before {
@@ -29,13 +29,20 @@
     z-index: -1;
 }
 
-.header,
-.button-container {
+.header {
     position: relative;
     z-index: 1;
 }
 
+.button-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    justify-content: center;
+}
+
 .main-section {
+    grid-area: section;
     text-align: center;
     background-color: white;
     color: #556B2F;
@@ -43,9 +50,10 @@
     border-radius: 22px;
 }
 
+
 @media (max-width: 767px) {
     .main-section {
-        padding: 0px;
+        padding: 20px;
         width: 100%;
     }
 
