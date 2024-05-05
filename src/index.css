@@ -201,6 +201,14 @@ body {
     font-weight: 600;
     font-size: 20px;
   }
+
+  .video-cont {
+    margin-top: 50px;
+  }
+
+  .btn-video {
+    width: 50% !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -213,44 +221,51 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 15px; /* Provides padding on smaller screens */
-  color: white; /* Sets text color to white for visibility */
+  padding: 0 15px;
+  /* Provides padding on smaller screens */
+  color: white;
+  /* Sets text color to white for visibility */
 }
 
 .control-group {
   display: flex;
   align-items: center;
-  gap: 10px; /* Adds space between elements */
+  gap: 10px;
+  /* Adds space between elements */
 }
 
 .btn {
-  margin-top: 10px; /* Ensures margin top is consistent */
-  padding: 8px 16px; /* Better touch targets */
-  font-size: 16px; /* Ensures readable font size */
+  margin-top: 10px;
+  /* Ensures margin top is consistent */
+  padding: 8px 16px;
+  /* Better touch targets */
+  font-size: 16px;
+  /* Ensures readable font size */
   cursor: pointer;
-  border: none; /* Removes default border */
+  border: none;
+  /* Removes default border */
 }
 
 @media (max-width: 768px) {
   .control-bar {
-      flex-direction: column;
+    flex-direction: column;
   }
 
   .btn {
-      width: 100%; 
-      margin-top: 5px; 
+    width: 100%;
+    margin-top: 5px;
   }
 
   .control-group {
-      width: 100%; 
-      justify-content: space-around; 
+    width: 100%;
+    justify-content: space-around;
   }
 }
 
 @media (max-width: 480px) {
   .btn {
-      padding: 10px 20px; 
-      font-size: 14px; 
+    padding: 10px 20px;
+    font-size: 14px;
   }
 }
 

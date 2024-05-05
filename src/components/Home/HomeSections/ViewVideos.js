@@ -66,7 +66,7 @@ function ViewVideos() {
     };
 
 
-    
+
     const handleSelectAll = () => {
         const newSelectAll = !selectAll;
         setSelectAll(newSelectAll);
@@ -150,7 +150,10 @@ function ViewVideos() {
                 return response.data.secure_url;
             }));
 
-            cloudinaryUrls.forEach(url => saveAs(url, url.split('/').pop()));
+            cloudinaryUrls.forEach((url, index) => {
+                const fileName = `wedding-video-${index + 1}`;
+                saveAs(url, fileName);
+            });
 
             Swal.fire(
                 'Download Complete!',
@@ -186,6 +189,7 @@ function ViewVideos() {
                             <Checkbox
                                 checked={selectAll}
                                 onChange={handleSelectAll}
+                                color="secondary"
                             />
                             <span className='select-all-text'>Select All</span>
                         </div>
@@ -209,24 +213,28 @@ function ViewVideos() {
                     </div>
                     <div className='view-images-row mt-3'>
                         {loading ? <p>Loading videos...</p> : (
-                           videos.map((video, index) => (
-                            <div key={`${index}-${video.selected}`} className=""> {/* Update key to force re-render */}
-                                <div className="container" style={{ position: 'relative' }}>
+                            videos.map((video, index) => (
+                                <div
+                                    key={`${index}-${video.selected}`}
+                                    className="container video-cont"
+                                    style={{ position: 'relative' }}
+                                >
                                     <Checkbox
                                         {...label}
+                                        color="secondary"
                                         checked={video.selected}
                                         onChange={() => handleVideoSelect(index)}
-                                        style={{ position: 'absolute', top: 0, right: 40, zIndex: 1 }}
+                                        style={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
                                     />
-                                        <video controls className="media-img"
-                                            src={video.url} alt={`Uploaded ${index}`}
-                                            style={{ width: "300px", height: "300px" }}
-                                        />
-                                        <button className="btn btn-danger mt-2"
-                                            onClick={() => handleDelete(video.ref)}>
-                                            Delete Video
-                                        </button>
-                                    </div>
+                                    <video controls className="media-img video-media"
+                                        src={video.url} alt={`Uploaded ${index}`}
+                                        style={{ width: "100%", height: "auto" }}
+                                    />
+                                    <button className="btn btn-danger mt-5 btn-video"
+                                        onClick={() => handleDelete(video.ref)}
+                                        style={{ position: 'absolute', bottom: "-50px", right: 10 }}>
+                                        Delete Video
+                                    </button>
                                 </div>
                             ))
                         )}

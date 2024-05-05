@@ -162,7 +162,7 @@ function ViewImages() {
     try {
       const response = await axios.post(
         'https://api.cloudinary.com/v1_1/drgrcajhq/image/upload', formData);
-      saveAs(response.data.secure_url, 'weeding-image.jpg');
+      saveAs(response.data.secure_url, 'wedding-image.jpg');
     } catch (error) {
       console.error('Failed to upload or download the image:', error);
       Swal.fire({
@@ -191,6 +191,7 @@ function ViewImages() {
               <Checkbox
                 checked={selectAll}
                 onChange={handleSelectAll}
+                color="secondary"
               />
               <span className='select-all-text'>Select All</span>
             </div>
@@ -215,6 +216,7 @@ function ViewImages() {
                   <div className="container" style={{ position: 'relative' }}>
                     <Checkbox
                       {...label}
+                      color="secondary"
                       checked={image.selected}
                       onChange={() => handleImageSelect(index)}
                       style={{ position: 'absolute', top: 0, right: 0, zIndex: 1 }}
