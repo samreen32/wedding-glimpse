@@ -6,6 +6,7 @@ import img2 from "../../../assets/img/home2.webp";
 import adPhoto from "../../../assets/img/cloud.png";
 import { IoIosArrowBack } from 'react-icons/io';
 import Lottie from 'lottie-react';
+import imageCompression from 'browser-image-compression';
 
 function UploadImages() {
   let navigate = useNavigate();
@@ -46,32 +47,47 @@ function UploadImages() {
     setSelectedFiles(prevFiles => prevFiles.filter(file => file.name !== fileName));
   };
 
-  const uploadImageToFirebase = async (file) => {
-    const storage = getStorage();
-    const storageRef = ref(storage, `images/${file.name}`);
+
+  const uploadImageToFirebase = async (files) => {
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true
+    };
+
     setUploading(true);
     try {
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadUrl = await getDownloadURL(snapshot.ref);
-      console.log('Firebase Upload successful:', downloadUrl);
       Swal.fire({
-        title: 'Success!',
-        text: 'Your image has been uploaded successfully!',
-        icon: 'success',
-        confirmButtonText: 'OK'
+        title: 'Please Wait',
+        text: 'Your images are being uploaded...',
+        icon: 'info',
+        timer: 2000,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+        }
       });
+      setUploading(false);
+
+      const compressedFile = await imageCompression(files, options);
+      const storage = getStorage();
+      const storageRef = ref(storage, `images/${compressedFile.name}`);
+      const snapshot = await uploadBytes(storageRef, compressedFile);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+      setSelectedFiles([]);
+      console.log('Firebase Upload successful:', downloadUrl);
     } catch (error) {
-      console.error('Firebase Upload failed:', error);
+      console.error('Compression or Firebase Upload failed:', error);
       Swal.fire({
         title: 'Oops!',
         text: 'Failed to upload. Try again!',
         icon: 'error',
         confirmButtonText: 'OK'
       });
-    } finally {
-      setUploading(false); // End uploading
     }
+    setUploading(false);
   };
+
 
   const handleUploadClick = () => {
     selectedFiles.forEach(file => {
@@ -184,44 +200,50 @@ function UploadImages() {
 
           <div className='row mt-3' style={{
             cursor: 'pointer',
-            maxHeight: '150px',
-
-            overflowY: 'auto'
+            maxHeight: '250px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'flex-start'
           }}>
-            <div style={{ display: "flex" }}>
-              {selectedFiles.map((file, index) => (
-                <div key={index} className="position-relative mb-2">
-                  {file.url ? (
-                    <div className='ad-selected-img mx-2'>
-                      <img
-                        src={file.url}
-                        alt={file.name}
-                        style={{ width: '200px', height: "200px", objectFit: "cover" }}
-                      />
-                      <button
-                        onClick={() => handleRemoveFile(file.name)}
-                        className='ad-img-cross-icon' >
-                        <span style={{ fontSize: '23px' }}>×</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className='ad-selected-img mx-2'>
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={file.name}
-                        style={{ width: '200px', height: "200px", objectFit: "cover" }}
-                      />
-                      <button
-                        onClick={() => handleRemoveFile(file.name)}
-                        className='ad-img-cross-icon' >
-                        <span style={{ fontSize: '23px' }}>×</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="position-relative mb-2" style={{
+                width: 'calc(1500px / 6)',
+                maxWidth: '200px',
+                flexGrow: 1,
+                flexBasis: 'calc(1500px / 6 - 10px)',
+              }}>
+                {file.url ? (
+                  <div className='ad-selected-img mx-2'>
+                    <img
+                      src={file.url}
+                      alt={file.name}
+                      style={{ width: '100%', height: "200px", objectFit: "cover" }}
+                    />
+                    <button
+                      onClick={() => handleRemoveFile(file.name)}
+                      className='ad-img-cross-icon'>
+                      <span style={{ fontSize: '23px' }}>×</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className='ad-selected-img mx-2'>
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={file.name}
+                      style={{ width: '100%', height: "200px", objectFit: "cover" }}
+                    />
+                    <button
+                      onClick={() => handleRemoveFile(file.name)}
+                      className='ad-img-cross-icon'>
+                      <span style={{ fontSize: '23px' }}>×</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
+
         </div>
         {uploading && (
           <div className="cv-progress-animation">

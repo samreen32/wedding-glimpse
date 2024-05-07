@@ -60,17 +60,23 @@ function UploadVideos() {
     const uploadVideoToFirebase = async (videoFile) => {
         const storage = getStorage();
         const storageRef = ref(storage, `videos/${videoFile.name}`);
-        setUploading(true); // Start uploading
+        setUploading(true);
         try {
+            Swal.fire({
+                title: 'Please Wait',
+                text: 'Your videos are being uploaded...',
+                icon: 'info',
+                timer: 1700,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            })
+            setUploading(false);
             const snapshot = await uploadBytes(storageRef, videoFile);
             const downloadUrl = await getDownloadURL(snapshot.ref);
+            setSelectedFiles([]);
             console.log('Firebase Upload successful:', downloadUrl);
-            Swal.fire({
-                title: 'Success!',
-                text: 'Your video has been uploaded successfully!',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            });
         } catch (error) {
             console.error('Firebase Upload failed:', error);
             Swal.fire({

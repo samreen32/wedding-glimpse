@@ -41,8 +41,8 @@ body {
 }
 
 .ad-selected-img {
-  max-width: 100px;
-  max-height: 100px;
+  /* max-width: 100px; */
+  /* max-height: 100px; */
   overflow: hidden;
   margin-top: 10px;
   border-radius: 20px;
@@ -178,7 +178,7 @@ body {
 
 .select-all-text {
   font-size: 18px;
-  color: #fff;
+  color: black;
 }
 
 @media (max-width: 1024px) {
